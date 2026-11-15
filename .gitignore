@@ -1,0 +1,15 @@
+# Packager output
+.release/
+
+# Editors and OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local scratch
+*.log
+*.tmp

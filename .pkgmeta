@@ -1,0 +1,11 @@
+package-as: PyroEncyclopedia
+
+enable-nolib-creation: no
+
+ignore:
+  - docs
+  - .github
+  - .editorconfig
+  - .luacheckrc
+  - .luarc.json
+  - CONTRIBUTING.md

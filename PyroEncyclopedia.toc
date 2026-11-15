@@ -1,0 +1,32 @@
+## Interface: 16001
+## Title: |cffff7f00Pyro|rEncyclopedia
+## Notes: Offline in-game item encyclopedia: where any item drops, who sells it, which recipes and quests use it.
+## Author: PyroEncyclopedia contributors
+## Version: @project-version@
+## Category: Database
+## X-License: MIT
+## OptionalDeps: QuestieDB, ProfessionDB, ItemDB
+## SavedVariables: PyroEncyclopediaDB
+
+# Load order matters: namespace helpers -> providers -> indexes -> queries -> UI -> init.
+
+Locales\enUS.lua
+
+Core\Util.lua
+Core\Scheduler.lua
+Core\Zones.lua
+
+Providers\Questie.lua
+Providers\Profession.lua
+Providers\LibItemDB.lua
+Providers\Client.lua
+
+Index\Index.lua
+Index\Recipes.lua
+Index\Quests.lua
+
+Query\ItemReport.lua
+
+UI\ChatReport.lua
+
+Core\Init.lua

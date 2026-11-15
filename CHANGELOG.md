@@ -13,4 +13,7 @@ All notable changes to this project are documented here. Versions follow
 - Lookup window (`/pyroenc`): item search, shift-click an item to look it up, item page with
   drops, vendors, recipes and quests. `/pyroenc print <item>` prints the same to chat.
 - `/pyroenc status` explains why a database addon is not loaded.
+- Item tooltip lines: best drop, vendor and price, recipes using it, related quests
+  (`/pyroenc tooltip` toggles them).
+- Titan Panel / data-broker button: click opens the window, right-click toggles tooltip lines.
 - Public API: `PyroEncyclopedia.RequestItemReport`, `GetItemReport`, `GetProviderStatus`.

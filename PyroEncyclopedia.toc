@@ -7,8 +7,14 @@
 ## X-License: MIT
 ## OptionalDeps: QuestieDB, ProfessionDB, ItemDB
 ## SavedVariables: PyroEncyclopediaDB
+## IconTexture: Interface\Icons\INV_Misc_Book_09
 
-# Load order matters: namespace helpers -> providers -> indexes -> queries -> UI -> init.
+# Load order matters: libraries -> namespace helpers -> providers -> indexes -> queries -> UI -> init.
+
+# Small standard libraries for the Titan Panel / data-broker button.
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 
 Locales\enUS.lua
 
@@ -30,5 +36,7 @@ Query\ItemReport.lua
 UI\ReportText.lua
 UI\ChatReport.lua
 UI\Window.lua
+UI\Tooltip.lua
+UI\Broker.lua
 
 Core\Init.lua

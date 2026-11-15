@@ -6,6 +6,7 @@ local U, L = ns.Util, ns.L
 local DEFAULTS = {
     schema = 1,
     chat = { maxRows = 8 },
+    tooltip = { enabled = true },
     prewarmIndexes = true,   -- build the cheap indexes a few seconds after login
 }
 
@@ -118,6 +119,7 @@ local function showHelp()
     U.Line(1, L["HELP_SEARCH"])
     U.Line(1, L["HELP_PRINT"])
     U.Line(1, L["HELP_STATUS"])
+    U.Line(1, L["HELP_TOOLTIP"])
 end
 
 SLASH_PYROENCYCLOPEDIA1 = "/pyroenc"
@@ -134,6 +136,8 @@ SlashCmdList["PYROENCYCLOPEDIA"] = function(msg)
         showStatus()
     elseif cmd == "print" then
         printItem(rest)
+    elseif cmd == "tooltip" then
+        ns.Tooltip.SetEnabled(not ns.db.tooltip.enabled)
     else
         ns.Window.Search((msg:match("^%s*(.-)%s*$")))
     end
@@ -152,8 +156,11 @@ frame:SetScript("OnEvent", function(_, event, arg1)
     elseif event == "PLAYER_LOGIN" then
         ns.DetectProviders()
         ns.Window.Init()
+        ns.Tooltip.Init()
+        -- Build the lookup indexes in the background shortly after login, so tooltips show
+        -- recipe and quest lines without waiting for a first window lookup.
         if ns.db.prewarmIndexes and C_Timer then
-            C_Timer.After(5, function() ns.Index.Ensure({ "recipes" }) end)
+            C_Timer.After(5, function() ns.Index.Ensure({ "recipes", "quests" }) end)
         end
     end
 end)

@@ -1,6 +1,6 @@
 std = "lua51"
 max_line_length = 130
-exclude_files = { ".release/", "docs/" }
+exclude_files = { ".release/", "docs/", "Libs/" }
 ignore = {
     "212/self",   -- unused self in method-style provider functions
 }
@@ -25,6 +25,8 @@ read_globals = {
     "ChatEdit_InsertLink",
     "ChatFrameUtil",
     "CreateFrame",
+    "Enum",
+    "TooltipDataProcessor",
     "GameTooltip",
     "UIParent",
     "UISpecialFrames",

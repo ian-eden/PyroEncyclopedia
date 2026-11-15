@@ -4,7 +4,7 @@ An offline, in-game item encyclopedia for **World of Warcraft: Forever**. Look u
 see where it drops, who sells it, which chests or nodes have it, which quests reward or need it,
 and which recipes make or use it, without alt-tabbing to a database website.
 
-> **Status: early development.** The lookup window works; a mouse-over tooltip is planned.
+> **Status: early development.** Lookup window, item tooltip lines and a Titan Panel button.
 
 ## How it works
 
@@ -44,9 +44,17 @@ but you get the full picture only with all three.
 | `/pyroenc <name \| id \| item link>` | Open the window and look it up |
 | `/pyroenc print <name \| id \| item link>` | Print the lookup to chat instead |
 | `/pyroenc status` | Show which databases are loaded, or why one isn't |
+| `/pyroenc tooltip` | Turn the extra item tooltip lines on or off |
 
 In the window, type at least three letters of an item name, or click into the search box and
 shift-click any item in your bags, chat or loot window.
+
+**Item tooltips** get a few short lines: the best drop (with chance), a vendor and price, how
+many recipes use the item, and quests that need or reward it.
+
+**Titan Panel:** right-click the panel and enable *PyroEncyclopedia*. Click the button to open
+the window; right-click it to turn the tooltip lines on or off. Other data-broker bars
+(ChocolateBar, Bazooka) work the same way.
 
 Example: Spider's Silk shows its droppers with drop chances and zones, and the 22 Tailoring
 and Leatherworking recipes that use it, with where to learn each one.
@@ -66,9 +74,9 @@ problems or crashes [here](../../issues).
 
 ## Roadmap
 
-1. **Done:** lookup window with item search and an item page.
-2. **Next:** a short mouse-over tooltip line (for example "Used in 22 recipes").
-3. Maybe later: clickable NPCs and recipes on the item page, localization.
+1. **Done:** lookup window, item tooltip lines, Titan Panel button.
+2. Maybe later: open an item's page with a modifier-click, clickable NPCs and recipes on the
+   item page, localization.
 
 The technical background is in [docs/research/01-technical-assessment.md](docs/research/01-technical-assessment.md).
 
@@ -91,7 +99,8 @@ Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License and credits
 
-PyroEncyclopedia's own code is released under the [MIT License](LICENSE).
+PyroEncyclopedia's own code is released under the [MIT License](LICENSE). `Libs/` contains the
+standard LibStub, CallbackHandler-1.0 and LibDataBroker-1.1 libraries under their own licences.
 
 It **does not include or redistribute** any data from the libraries above. Their data stays
 under their own licences and belongs to their authors: QuestieDB (Questie team and

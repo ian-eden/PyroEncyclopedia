@@ -30,11 +30,13 @@ Providers\Client.lua
 Index\Index.lua
 Index\Recipes.lua
 Index\Quests.lua
+Index\ItemRelations.lua
 
 Query\ItemReport.lua
 
 UI\ReportText.lua
 UI\ChatReport.lua
+UI\Pages.lua
 UI\Window.lua
 UI\Tooltip.lua
 UI\Broker.lua

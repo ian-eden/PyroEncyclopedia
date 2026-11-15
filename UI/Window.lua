@@ -10,7 +10,6 @@ local U, L = ns.Util, ns.L
 local WIDTH, HEIGHT = 840, 540
 local LEFT_W = 250
 local ROW_H = 20
-local PAGE_ROWS = 25          -- rows per section on the item page
 local QUESTION_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
 
 local frame
@@ -78,40 +77,64 @@ local function runSearch()
     setResults(searchRows(text))
 end
 
--- Item page -----------------------------------------------------------------------------
+-- Pages (item / quest / npc / recipe, see UI/Pages.lua) ----------------------------------
 
-local function renderReport(report)
+local history = {}
+
+local function render(kind, id)
     local page = frame.page
-    local title, facts = ns.ReportText.Header(report)
-    page.title:SetText(title)
-    page.facts:SetText(facts)
-    local _, _, icon = ns.Providers.Client:GetItemInstant(report.id)
-    page.icon:SetTexture(icon or QUESTION_ICON)
-    page.body:SetText(table.concat(ns.ReportText.Body(report, PAGE_ROWS), "\n"))
+    if page.kind ~= kind or page.id ~= id then return end   -- user moved on meanwhile
+    local ok, result = pcall(ns.Pages[kind].build, id)
+    if not ok then
+        geterrorhandler()(result)
+        result = { title = tostring(id), facts = "", lines = { U.Gray(L["PAGE_UNKNOWN"]) } }
+    end
+    page.title:SetText(result.title or "")
+    page.facts:SetText(result.facts or "")
+    page.icon:SetTexture(result.icon or QUESTION_ICON)
+    page.body:SetText(table.concat(result.lines or {}, "\n"))
     page.content:SetHeight(page.body:GetStringHeight() + 20)
     page.scroll:SetVerticalScroll(0)
 end
 
-function Window.ShowItem(itemId)
-    itemId = tonumber(itemId)
-    if not itemId then return end
+--- Show a page. kind: "item" | "quest" | "npc" | "recipe"; id: number, or "profId-spellId".
+function Window.Show(kind, id, fromBack)
+    local def = ns.Pages[kind]
+    if not def or id == nil then return end
     Window.Open()
     local page = frame.page
-    page.itemId = itemId
-    page.title:SetText(("item %d"):format(itemId))
+    if page.kind and not fromBack and not (page.kind == kind and page.id == id) then
+        history[#history + 1] = { page.kind, page.id }
+    end
+    page.kind, page.id = kind, id
+    frame.back:SetEnabled(#history > 0)
+    page.title:SetText("")
     page.facts:SetText("")
     page.body:SetText(L["BUILDING"])
-    ns.ItemReport.Request(itemId, { maxRows = PAGE_ROWS }, function(report)
-        if page.itemId == itemId then renderReport(report) end
-    end)
-    -- Names and icons of items the client has never seen arrive a moment later.
-    ns.Providers.Client:RequestItem(itemId, function()
-        if page.itemId == itemId and frame:IsShown() then
-            ns.ItemReport.Request(itemId, { maxRows = PAGE_ROWS }, function(report)
-                if page.itemId == itemId then renderReport(report) end
-            end)
-        end
-    end)
+    ns.Index.Ensure(def.needs, function() render(kind, id) end)
+    if kind == "item" then
+        -- Names and icons of items the client has never seen arrive a moment later.
+        ns.Providers.Client:RequestItem(id, function()
+            local ready = true
+            for _, name in ipairs(def.needs) do ready = ready and ns.Index.IsReady(name) end
+            if ready and frame:IsShown() then render(kind, id) end
+        end)
+    end
+end
+
+function Window.ShowItem(itemId)
+    Window.Show("item", tonumber(itemId))
+end
+
+function Window.Back()
+    local prev = table.remove(history)
+    if prev then Window.Show(prev[1], prev[2], true) end
+end
+
+local function parseLink(link)
+    local kind, id = tostring(link):match("^pyroenc:(%a+):(.+)$")
+    if not kind then return nil end
+    return kind, kind == "recipe" and id or tonumber(id)
 end
 
 -- Construction --------------------------------------------------------------------------
@@ -185,17 +208,26 @@ local function create()
     page.icon:SetPoint("TOPLEFT", x, -32)
     page.icon:SetTexture(QUESTION_ICON)
 
+    local back = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+    back:SetSize(70, 22)
+    back:SetPoint("TOPRIGHT", -16, -32)
+    back:SetText(L["WIN_BACK"])
+    back:SetEnabled(false)
+    back:SetScript("OnClick", Window.Back)
+    f.back = back
+
     local titleButton = CreateFrame("Button", nil, f)
     titleButton:SetPoint("TOPLEFT", page.icon, "TOPRIGHT", 8, 0)
-    titleButton:SetPoint("RIGHT", f, "RIGHT", -16, 0)
+    titleButton:SetPoint("RIGHT", back, "LEFT", -8, 0)
     titleButton:SetHeight(20)
     page.title = titleButton:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     page.title:SetAllPoints()
     page.title:SetJustifyH("LEFT")
+    page.title:SetWordWrap(false)
     titleButton:SetScript("OnEnter", function(self)
-        if not page.itemId then return end
+        if page.kind ~= "item" then return end
         GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
-        GameTooltip:SetHyperlink("item:" .. page.itemId)
+        GameTooltip:SetHyperlink("item:" .. page.id)
         GameTooltip:Show()
     end)
     titleButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -224,6 +256,35 @@ local function create()
     page.body:SetSpacing(2)
     page.body:SetText(L["WIN_WELCOME"])
     f.page = page
+
+    -- Clickable names in the page text (see Util.Link): click opens that page; hovering an
+    -- item or recipe shows the game's own tooltip for it.
+    local content = page.content
+    if content.SetHyperlinksEnabled then
+        content:EnableMouse(true)
+        content:SetHyperlinksEnabled(true)
+        content:SetScript("OnHyperlinkClick", function(_, link)
+            local kind, id = parseLink(link)
+            if kind then Window.Show(kind, id) end
+        end)
+        content:SetScript("OnHyperlinkEnter", function(self, link)
+            local kind, id = parseLink(link)
+            if not kind then return end
+            GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+            if kind == "item" then
+                GameTooltip:SetHyperlink("item:" .. id)
+            elseif kind == "recipe" then
+                local spellId = tostring(id):match("%-(%d+)$")
+                if not pcall(GameTooltip.SetHyperlink, GameTooltip, "spell:" .. spellId) then
+                    GameTooltip:AddLine(L["WIN_CLICK_TO_OPEN"])
+                end
+            else
+                GameTooltip:AddLine(L["WIN_CLICK_TO_OPEN"], 1, 1, 1)
+            end
+            GameTooltip:Show()
+        end)
+        content:SetScript("OnHyperlinkLeave", function() GameTooltip:Hide() end)
+    end
 
     frame = f   -- setResults below reads the shared `frame`, so register it first
     setResults({}, false, L["WIN_TYPE_MORE"])

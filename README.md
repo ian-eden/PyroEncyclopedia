@@ -74,9 +74,9 @@ problems or crashes [here](../../issues).
 
 ## Roadmap
 
-1. **Done:** lookup window, item tooltip lines, Titan Panel button.
-2. Maybe later: open an item's page with a modifier-click, clickable NPCs and recipes on the
-   item page, localization.
+1. **Done:** lookup window with clickable item, quest, NPC and recipe pages; item tooltip
+   lines; Titan Panel button.
+2. Maybe later: open an item's page with a modifier-click, localization.
 
 The technical background is in [docs/research/01-technical-assessment.md](docs/research/01-technical-assessment.md).
 

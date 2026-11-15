@@ -43,15 +43,40 @@ end
 
 function Util.Gray(text) return "|cff9d9d9d" .. tostring(text) .. "|r" end
 
--- Item name without brackets, coloured by its quality (white when unknown).
-function Util.QualityName(itemId, name)
-    name = tostring(name or ("#" .. itemId)):gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("|H.-|h", "")
-        :gsub("|h", ""):gsub("^%[", ""):gsub("%]$", "")
+local function plainName(name, itemId)
+    return (tostring(name or ("#" .. itemId)):gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("|H.-|h", "")
+        :gsub("|h", ""):gsub("^%[", ""):gsub("%]$", ""))
+end
+
+-- "|cffRRGGBB" for an item's quality (white when unknown).
+local function qualityColor(itemId)
     local IDB = ns.Providers.LibItemDB
     local quality = IDB:IsAvailable() and select(2, IDB:GetInfo(itemId)) or nil
     local color = quality and ITEM_QUALITY_COLORS and ITEM_QUALITY_COLORS[quality]
-    if color and color.hex then return color.hex .. name .. "|r" end
-    return name
+    return color and color.hex or "|cffffffff"
+end
+
+-- Item name without brackets, coloured by its quality.
+function Util.QualityName(itemId, name)
+    return qualityColor(itemId) .. plainName(name, itemId) .. "|r"
+end
+
+-- Clickable links inside the PyroEncyclopedia window: |Hpyroenc:<kind>:<id>|h. They only
+-- work in our own window, so chat output strips them (Util.StripLinks).
+local LINK_COLORS = { quest = "|cffffe066", npc = "|cff7fc8ff", recipe = "|cffff9f40" }
+
+function Util.Link(kind, id, text)
+    local color = kind == "item" and qualityColor(id) or LINK_COLORS[kind] or "|cffffffff"
+    if kind == "item" then text = plainName(text, id) end
+    return ("%s|Hpyroenc:%s:%s|h%s|h|r"):format(color, kind, tostring(id), tostring(text))
+end
+
+function Util.ItemLink(itemId, name)
+    return Util.Link("item", itemId, name or ns.ItemName(itemId))
+end
+
+function Util.StripLinks(text)
+    return (text:gsub("|Hpyroenc:[^|]*|h(.-)|h", "%1"))
 end
 function Util.Gold(text) return "|cffffd100" .. tostring(text) .. "|r" end
 

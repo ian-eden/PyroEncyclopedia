@@ -8,7 +8,8 @@ function ChatReport.Print(r, maxRows)
     local U = ns.Util
     local title, facts = ns.ReportText.Header(r)
     U.Print("%s %s %s", title, U.Gray("(" .. r.id .. ")"), facts)
+    -- Window-only links would error if clicked in chat, so print their text only.
     for _, line in ipairs(ns.ReportText.Body(r, maxRows)) do
-        if line ~= " " then DEFAULT_CHAT_FRAME:AddMessage("  " .. line) end
+        if line ~= " " then DEFAULT_CHAT_FRAME:AddMessage("  " .. U.StripLinks(line)) end
     end
 end

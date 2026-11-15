@@ -16,8 +16,14 @@ end
 
 local function questLabel(q)
     local lvl = q.questLevel and ("[" .. q.questLevel .. "] ") or ""
-    return ("%s%s %s"):format(lvl, q.name or "?", U.Gray("(" .. q.id .. ")"))
+    return lvl .. U.Link("quest", q.id, q.name or ("#" .. q.id))
 end
+ReportText.QuestLabel = questLabel
+
+local function recipeLink(rec)
+    return U.Link("recipe", rec.profId .. "-" .. rec.spellId, rec.name or ("spell " .. rec.spellId))
+end
+ReportText.RecipeLink = recipeLink
 
 local function sourceSummary(rec)
     if rec.autoLearned then return L["SRC_learned"] end
@@ -33,7 +39,7 @@ local function sourceSummary(rec)
                 local npc = ns.Providers.Questie:IsAvailable() and ns.Providers.Questie:GetNpc(first.id)
                 name = npc and npc.name
             end
-            text = text .. ": " .. (name or ("#" .. first.id))
+            text = text .. ": " .. U.Link("npc", first.id, name or ("#" .. first.id))
             if first.faction then text = text .. " (" .. first.faction .. ")" end
         end
         if kind.total > 1 then text = text .. " (" .. kind.total .. ")" end
@@ -69,11 +75,13 @@ function ReportText.Body(r, maxRows)
         if total > shown then add(1, U.Gray(L["AND_MORE"]:format(total - shown))) end
     end
 
-    local function placeRows(section)
+    -- linkKind: "npc" for creatures and vendors; objects have no page, so stay plain text.
+    local function placeRows(section, linkKind)
         local shown = math.min(section.total, maxRows)
         for i = 1, shown do
             local row = section.rows[i]
-            local parts = { row.name or ("#" .. row.id) }
+            local name = row.name or ("#" .. row.id)
+            local parts = { linkKind and U.Link(linkKind, row.id, name) or name }
             local lvl = U.LevelRange(row.minLevel, row.maxLevel)
             if lvl then parts[#parts + 1] = "(" .. lvl .. ")" end
             if row.chance then parts[#parts + 1] = "|cff20ff20" .. U.Percent(row.chance) .. "|r" end
@@ -96,15 +104,16 @@ function ReportText.Body(r, maxRows)
             local qty = rec.qty and (" x" .. rec.qty) or ""
             -- Only name the result when it differs from the recipe name.
             local made = ""
-            if rec.craftedName and rec.craftedName ~= rec.name then made = " -> " .. rec.craftedName end
+            if rec.craftedItemId and rec.craftedName ~= rec.name then
+                made = " -> " .. U.ItemLink(rec.craftedItemId, rec.craftedName)
+            end
             local hidden = rec.hidden and (" " .. U.Gray("[" .. L["NEVER_IMPLEMENTED"] .. "]")) or ""
-            add(1, ("%s%s: %s%s%s%s - %s"):format(prof, skill, rec.name or ("spell " .. rec.spellId), qty, made,
-                hidden, sourceSummary(rec)))
+            add(1, ("%s%s: %s%s%s%s - %s"):format(prof, skill, recipeLink(rec), qty, made, hidden, sourceSummary(rec)))
         end
         more(shown, section.total)
     end
 
-    if r.drops.total > 0 then header(L["SEC_DROPS"], r.drops.total); placeRows(r.drops) end
+    if r.drops.total > 0 then header(L["SEC_DROPS"], r.drops.total); placeRows(r.drops, "npc") end
     if #r.bosses > 0 then
         header(L["SEC_BOSSES"], #r.bosses)
         for i = 1, math.min(#r.bosses, maxRows) do
@@ -119,14 +128,14 @@ function ReportText.Body(r, maxRows)
         header(L["SEC_CONTAINERS"], r.containers.total)
         for i = 1, math.min(r.containers.total, maxRows) do
             local c = r.containers.rows[i]
-            add(1, (c.name or "?") .. " " .. U.Gray("(" .. c.id .. ")"))
+            add(1, U.ItemLink(c.id, c.name))
         end
         more(math.min(r.containers.total, maxRows), r.containers.total)
     end
     if r.vendors.total > 0 then
         local buy = U.Money(r.buyPrice)
         header(L["SEC_VENDORS"] .. (buy and (" - " .. L["BUY_FOR"]:format(buy)) or ""), r.vendors.total)
-        placeRows(r.vendors)
+        placeRows(r.vendors, "npc")
     end
     if #r.origins > 0 then
         header(L["SEC_ORIGINS"])
@@ -153,7 +162,7 @@ function ReportText.Body(r, maxRows)
     if r.teaches then
         header(L["SEC_TEACHES"])
         local prof = ns.ProfessionNames[r.teaches.profId] or r.teaches.profId
-        add(1, ("%s: %s"):format(prof, r.teaches.name or ("spell " .. r.teaches.spellId)))
+        add(1, ("%s: %s"):format(prof, recipeLink(r.teaches)))
     end
 
     if #lines == 0 then add(0, U.Gray(L["NOTHING_KNOWN"])) end

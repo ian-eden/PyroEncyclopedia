@@ -66,6 +66,7 @@ local function itemName(itemId)
         or ns.Providers.Questie:GetItemName(itemId)
         or (ns.Providers.Client:GetItem(itemId))
 end
+ns.ItemName = itemName
 
 -- Merge LibItemDB rows of `kind` with a QuestieDB id list into report section `section`.
 local function mergeSection(section, placesByKind, kind, questieIds, enrich, maxRows)
@@ -187,7 +188,8 @@ function Report.Build(itemId, opts)
         local byQuest, order = {}, {}
         for i = 1, #uses, 2 do
             local questId, reason = uses[i], uses[i + 1]
-            if not (reason == "starts" and r.startsQuest and r.startsQuest.id == questId) then
+            -- A quest the item starts is already listed under "Starts quest".
+            if not (r.startsQuest and r.startsQuest.id == questId) then
                 if not byQuest[questId] then
                     byQuest[questId] = Q:GetQuest(questId) or { id = questId }
                     byQuest[questId].reasons = {}

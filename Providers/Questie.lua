@@ -15,7 +15,15 @@ local ITEM_FIELDS = {
     "name", "npcDrops", "objectDrops", "itemDrops", "startQuest", "questRewards",
     "vendors", "relatedQuests", "teachesSpell", "itemLevel", "requiredLevel", "class", "subClass",
 }
-local NPC_FIELDS = { "name", "subName", "minLevel", "maxLevel", "rank", "zoneID", "spawns", "friendlyToFaction" }
+local NPC_FIELDS = {
+    "name", "subName", "minLevel", "maxLevel", "rank", "zoneID", "spawns", "friendlyToFaction",
+    "questStarts", "questEnds",
+}
+local QUEST_DETAIL_FIELDS = {
+    "name", "questLevel", "requiredLevel", "startedBy", "finishedBy", "objectivesText", "objectives",
+    "sourceItemId", "requiredSourceItems", "preQuestSingle", "preQuestGroup", "nextQuestInChain",
+    "zoneOrSort", "requiredSkill",
+}
 local OBJECT_FIELDS = { "name", "zoneID", "spawns" }
 local QUEST_FIELDS = { "name", "questLevel", "requiredLevel" }
 
@@ -106,6 +114,23 @@ function P:GetQuest(questId)
     q.questLevel = nz(q.questLevel)
     q.requiredLevel = nz(q.requiredLevel)
     return q
+end
+
+-- Everything the quest page shows. startedBy = {npcIds, objectIds, itemIds}, finishedBy =
+-- {npcIds, objectIds}, objectives = {creatures, objects, items, rep, killcredit, spell}.
+function P:GetQuestDetails(questId)
+    if not self.available or not self.Quest.Exists(questId) then return nil end
+    local v = self.Quest.GetAll(questId, QUEST_DETAIL_FIELDS)
+    if not v then return nil end
+    local q = unpackFields(QUEST_DETAIL_FIELDS, v)
+    q.id = questId
+    q.questLevel, q.requiredLevel = nz(q.questLevel), nz(q.requiredLevel)
+    q.sourceItemId, q.nextQuestInChain, q.zoneOrSort = nz(q.sourceItemId), nz(q.nextQuestInChain), nz(q.zoneOrSort)
+    return q
+end
+
+function P:GetObjectName(objectId)
+    return self.available and self.Object.name(objectId) or nil
 end
 
 -- Exact-name lookup (QuestieDB's index is exact match only). Returns the lowest id or nil.

@@ -22,10 +22,18 @@ ns.ProfessionNames = {
 }
 
 L["HELP_HEADER"] = "commands:"
-L["HELP_ITEM"] = "/pyroenc item <id | item link | exact name> - print everything known about an item"
-L["HELP_SHORT"] = "/pyroenc <id | item link> - same as /pyroenc item"
-L["HELP_STATUS"] = "/pyroenc status - show which data sources are loaded"
-L["HELP_ROWS"] = "/pyroenc rows <n> - rows shown per section (currently %d)"
+L["HELP_OPEN"] = "/pyroenc - open or close the lookup window"
+L["HELP_SEARCH"] = "/pyroenc <name | id | item link> - open the window and look it up"
+L["HELP_PRINT"] = "/pyroenc print <name | id | item link> - print the lookup to chat instead"
+L["HELP_STATUS"] = "/pyroenc status - show which databases are loaded"
+
+L["WIN_SEARCH_HINT"] = "Search items..."
+L["WIN_TYPE_MORE"] = "Type at least 3 letters, an item id, or shift-click an item into the box."
+L["WIN_NO_RESULTS"] = "No items found."
+L["WIN_RESULTS"] = "%d items"
+L["WIN_RESULTS_CAPPED"] = "First %d items - type more to narrow it down"
+L["WIN_WELCOME"] = "Search for an item on the left, or click into the search box and "
+    .. "shift-click any item (bags, chat, loot) to look it up."
 
 L["STATUS_HEADER"] = "data sources:"
 L["NOT_INSTALLED"] = "not installed"

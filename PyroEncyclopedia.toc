@@ -27,6 +27,8 @@ Index\Quests.lua
 
 Query\ItemReport.lua
 
+UI\ReportText.lua
 UI\ChatReport.lua
+UI\Window.lua
 
 Core\Init.lua

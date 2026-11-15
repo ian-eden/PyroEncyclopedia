@@ -51,7 +51,7 @@ local function resolveItem(text)
     return ns.Providers.LibItemDB:FindByName(text) or ns.Providers.Questie:FindItemByName(text)
 end
 
-local function showItem(text)
+local function printItem(text)
     if not ns.hasData then U.Print(L["NO_PROVIDERS"]) end
     local itemId = resolveItem(text)
     if not itemId then
@@ -114,10 +114,10 @@ end
 
 local function showHelp()
     U.Print(L["HELP_HEADER"])
-    U.Line(1, L["HELP_ITEM"])
-    U.Line(1, L["HELP_SHORT"])
+    U.Line(1, L["HELP_OPEN"])
+    U.Line(1, L["HELP_SEARCH"])
+    U.Line(1, L["HELP_PRINT"])
     U.Line(1, L["HELP_STATUS"])
-    U.Line(1, L["HELP_ROWS"]:format(ns.db.chat.maxRows))
 end
 
 SLASH_PYROENCYCLOPEDIA1 = "/pyroenc"
@@ -126,24 +126,16 @@ SlashCmdList["PYROENCYCLOPEDIA"] = function(msg)
     msg = msg or ""
     local cmd, rest = msg:match("^%s*(%S*)%s*(.-)%s*$")
     cmd = (cmd or ""):lower()
-    if cmd == "" or cmd == "help" then
+    if cmd == "" then
+        ns.Window.Toggle()
+    elseif cmd == "help" then
         showHelp()
     elseif cmd == "status" then
         showStatus()
-    elseif cmd == "item" then
-        showItem(rest)
-    elseif cmd == "rows" then
-        local n = tonumber(rest)
-        if n and n >= 1 and n <= 50 then
-            ns.db.chat.maxRows = math.floor(n)
-            U.Print(L["ROWS_SET"], ns.db.chat.maxRows)
-        else
-            showHelp()
-        end
-    elseif U.ParseItemId(msg) then
-        showItem(msg)
+    elseif cmd == "print" then
+        printItem(rest)
     else
-        showHelp()
+        ns.Window.Search((msg:match("^%s*(.-)%s*$")))
     end
 end
 
@@ -159,6 +151,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         ns.db = PyroEncyclopediaDB
     elseif event == "PLAYER_LOGIN" then
         ns.DetectProviders()
+        ns.Window.Init()
         if ns.db.prewarmIndexes and C_Timer then
             C_Timer.After(5, function() ns.Index.Ensure({ "recipes" }) end)
         end

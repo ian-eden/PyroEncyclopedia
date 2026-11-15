@@ -34,7 +34,7 @@ local function questLabel(q)
     return ("%s%s %s"):format(lvl, q.name or "?", U.Gray("(" .. q.id .. ")"))
 end
 
-local function placeRows(section, maxRows, withPrice)
+local function placeRows(section, maxRows)
     local shown = math.min(section.total, maxRows)
     for i = 1, shown do
         local row = section.rows[i]

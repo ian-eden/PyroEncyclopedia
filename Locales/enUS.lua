@@ -33,6 +33,10 @@ L["NO_PROVIDERS"] = "No data source is loaded. Install QuestieDB, ProfessionDB (
 L["ITEM_NOT_FOUND"] = "No item found for '%s'. Use an item id, a shift-clicked item link, or the exact item name."
 L["BUILDING"] = "Building indexes for the first lookup, one moment..."
 L["ROWS_SET"] = "Rows per section set to %d."
+L["WHY_MISSING"] = "not installed"
+L["WHY_DISABLED"] = "turned off for this character (AddOns button on the character screen)"
+L["WHY_OUTDATED"] = "out of date (tick 'Load out of date AddOns' on the character screen)"
+L["WHY_NEEDS"] = "can't start, needs: %s"
 
 L["SEC_DROPS"] = "Dropped by"
 L["SEC_BOSSES"] = "Boss loot"

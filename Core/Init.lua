@@ -65,12 +65,45 @@ local function showItem(text)
     if waited then U.Print(L["BUILDING"]) end
 end
 
+-- Addon folder behind each provider, used to explain why a database did not load.
+local PROVIDER_ADDON = { Questie = "QuestieDB", Profession = "ProfessionDB", LibItemDB = "ItemDB" }
+
+local function addonState(name)
+    local getInfo = (C_AddOns and C_AddOns.GetAddOnInfo) or _G.GetAddOnInfo
+    if not getInfo then return nil end
+    local _, _, _, loadable, reason = getInfo(name)
+    return loadable, reason
+end
+
+-- Plain-language reason an installed-or-not addon is not running, or nil if it is fine.
+local function whyNotLoaded(name)
+    local isLoaded = (C_AddOns and C_AddOns.IsAddOnLoaded) or _G.IsAddOnLoaded
+    if isLoaded and isLoaded(name) then return nil end
+    local _, reason = addonState(name)
+    if reason == "MISSING" then return L["WHY_MISSING"] end
+    if reason == "DISABLED" then return L["WHY_DISABLED"] end
+    if reason == "INTERFACE_VERSION" then return L["WHY_OUTDATED"] end
+    if reason == "DEP_MISSING" or reason == "DEP_DISABLED" or reason == "DEP_INTERFACE_VERSION" then
+        local getDeps = (C_AddOns and C_AddOns.GetAddOnDependencies) or _G.GetAddOnDependencies
+        local problems = {}
+        for _, dep in ipairs(getDeps and { getDeps(name) } or {}) do
+            local depReason = whyNotLoaded(dep)
+            if depReason then problems[#problems + 1] = dep .. " (" .. depReason .. ")" end
+        end
+        return L["WHY_NEEDS"]:format(#problems > 0 and table.concat(problems, ", ") or reason)
+    end
+    return reason and reason:lower() or L["WHY_MISSING"]
+end
+
 local function showStatus()
     U.Print("v%s %s", ns.version, L["STATUS_HEADER"])
     for _, key in ipairs(ns.ProviderOrder) do
         local p = ns.Providers[key]
         local color = p.available and "|cff20ff20" or "|cffff5050"
-        U.Line(1, "%s%s|r: %s", color, p.title, tostring(p.status))
+        local status = p.status
+        local addon = PROVIDER_ADDON[key]
+        if not p.available and addon then status = whyNotLoaded(addon) or status end
+        U.Line(1, "%s%s|r: %s", color, p.title, tostring(status))
     end
     local states = {}
     for name in pairs(ns.Index.builders) do states[#states + 1] = name .. "=" .. ns.Index.state[name] end

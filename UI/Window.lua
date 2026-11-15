@@ -225,6 +225,7 @@ local function create()
     page.body:SetText(L["WIN_WELCOME"])
     f.page = page
 
+    frame = f   -- setResults below reads the shared `frame`, so register it first
     setResults({}, false, L["WIN_TYPE_MORE"])
     return f
 end

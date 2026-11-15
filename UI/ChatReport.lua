@@ -69,7 +69,7 @@ local function sourceSummary(rec)
             text = text .. ": " .. (name or ("#" .. first.id))
             if first.faction then text = text .. " (" .. first.faction .. ")" end
         end
-        if kind.total > 1 then text = text .. " x" .. kind.total end
+        if kind.total > 1 then text = text .. " (" .. kind.total .. ")" end
         parts[#parts + 1] = text
     end
     local out = table.concat(parts, ", ")
@@ -85,7 +85,9 @@ local function recipeRows(section, maxRows)
         local skill = rec.requiredSkill and (" " .. rec.requiredSkill) or ""
         if rec.requiredSkillBorrowed then skill = skill .. "?" end
         local qty = rec.qty and (" x" .. rec.qty) or ""
-        local made = rec.craftedName and (" -> " .. rec.craftedName) or ""
+        -- Only name the result when it differs from the recipe ("Bolt of Silk Cloth" vs "Silk Cloth").
+        local made = ""
+        if rec.craftedName and rec.craftedName ~= rec.name then made = " -> " .. rec.craftedName end
         local hidden = rec.hidden and (" " .. U.Gray("[" .. L["NEVER_IMPLEMENTED"] .. "]")) or ""
         U.Line(2, "%s%s: %s%s%s%s - %s", prof, skill, rec.name or ("spell " .. rec.spellId), qty, made, hidden,
             sourceSummary(rec))

@@ -92,7 +92,8 @@ local function whyNotLoaded(name)
         end
         return L["WHY_NEEDS"]:format(#problems > 0 and table.concat(problems, ", ") or reason)
     end
-    return reason and reason:lower() or L["WHY_MISSING"]
+    if reason == nil or reason == "" then return L["WHY_RELOAD"] end
+    return reason:lower()
 end
 
 local function showStatus()

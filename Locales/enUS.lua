@@ -37,6 +37,7 @@ L["WHY_MISSING"] = "not installed"
 L["WHY_DISABLED"] = "turned off for this character (AddOns button on the character screen)"
 L["WHY_OUTDATED"] = "out of date (tick 'Load out of date AddOns' on the character screen)"
 L["WHY_NEEDS"] = "can't start, needs: %s"
+L["WHY_RELOAD"] = "turned on but not loaded yet - type /reload"
 
 L["SEC_DROPS"] = "Dropped by"
 L["SEC_BOSSES"] = "Boss loot"

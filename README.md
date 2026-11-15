@@ -4,8 +4,7 @@ An offline, in-game item encyclopedia for **World of Warcraft: Forever**. Look u
 see where it drops, who sells it, which chests or nodes have it, which quests reward or need it,
 and which recipes make or use it, without alt-tabbing to a database website.
 
-> **Status: early development (phase 1).** Lookups work through a chat command. The mouse-over
-> tooltip and the full encyclopedia window are next. See the [roadmap](#roadmap).
+> **Status: early development.** The lookup window works; a mouse-over tooltip is planned.
 
 ## How it works
 
@@ -41,13 +40,16 @@ but you get the full picture only with all three.
 
 | Command | What it does |
 | --- | --- |
-| `/pyroenc item <id \| link \| exact name>` | Print everything known about an item |
-| `/pyroenc <id \| link>` | Same, shorter (shift-click an item into the chat box) |
-| `/pyroenc status` | Show which data sources are loaded and their versions |
-| `/pyroenc rows <n>` | Rows shown per section (default 8) |
+| `/pyroenc` | Open or close the lookup window |
+| `/pyroenc <name \| id \| item link>` | Open the window and look it up |
+| `/pyroenc print <name \| id \| item link>` | Print the lookup to chat instead |
+| `/pyroenc status` | Show which databases are loaded, or why one isn't |
 
-Example: `/pyroenc 3182` (Spider's Silk) lists its droppers with drop chances and zones, and the 22
-Tailoring and Leatherworking recipes that use it, with where to learn each one.
+In the window, type at least three letters of an item name, or click into the search box and
+shift-click any item in your bags, chat or loot window.
+
+Example: Spider's Silk shows its droppers with drop chances and zones, and the 22 Tailoring
+and Leatherworking recipes that use it, with where to learn each one.
 
 ## Data accuracy
 
@@ -64,10 +66,9 @@ problems or crashes [here](../../issues).
 
 ## Roadmap
 
-1. **Phase 1 (current):** data providers, runtime reverse indexes, `/pyroenc` chat lookups.
-2. **Phase 2:** mouse-over tooltip with a configurable set of lines.
-3. **Phase 3:** full encyclopedia window: search, item page, NPC pages, recipe pages.
-4. Later: options panel, map pins, localization.
+1. **Done:** lookup window with item search and an item page.
+2. **Next:** a short mouse-over tooltip line (for example "Used in 22 recipes").
+3. Maybe later: clickable NPCs and recipes on the item page, localization.
 
 The technical background is in [docs/research/01-technical-assessment.md](docs/research/01-technical-assessment.md).
 

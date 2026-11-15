@@ -40,6 +40,7 @@ read_globals = {
     "GetItemInfo",
     "GetItemInfoInstant",
     "GetItemSubClassInfo",
+    "ITEM_QUALITY_COLORS",
     "Item",
     "debugprofilestop",
     "geterrorhandler",

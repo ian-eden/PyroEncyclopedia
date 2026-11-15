@@ -54,7 +54,7 @@ local function setResults(rows, capped, message)
         end
         b.itemId = row.id
         local extra = row.itemLevel and row.itemLevel > 0 and U.Gray(" " .. row.itemLevel) or ""
-        b.text:SetText((row.name or row.plainName or ("#" .. row.id)) .. extra)
+        b.text:SetText(U.QualityName(row.id, row.plainName or row.name) .. extra)
         b:Show()
     end
     for i = #rows + 1, #list.buttons do list.buttons[i]:Hide() end

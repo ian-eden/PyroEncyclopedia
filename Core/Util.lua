@@ -42,6 +42,17 @@ function Util.LevelRange(minL, maxL)
 end
 
 function Util.Gray(text) return "|cff9d9d9d" .. tostring(text) .. "|r" end
+
+-- Item name without brackets, coloured by its quality (white when unknown).
+function Util.QualityName(itemId, name)
+    name = tostring(name or ("#" .. itemId)):gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("|H.-|h", "")
+        :gsub("|h", ""):gsub("^%[", ""):gsub("%]$", "")
+    local IDB = ns.Providers.LibItemDB
+    local quality = IDB:IsAvailable() and select(2, IDB:GetInfo(itemId)) or nil
+    local color = quality and ITEM_QUALITY_COLORS and ITEM_QUALITY_COLORS[quality]
+    if color and color.hex then return color.hex .. name .. "|r" end
+    return name
+end
 function Util.Gold(text) return "|cffffd100" .. tostring(text) .. "|r" end
 
 -- Item id from a number, a numeric string, an item link or "item:<id>".

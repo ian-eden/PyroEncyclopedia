@@ -93,7 +93,6 @@ function ReportText.Body(r, maxRows)
             local rec = section.rows[i]
             local prof = ns.ProfessionNames[rec.profId] or ("Profession " .. rec.profId)
             local skill = rec.requiredSkill and (" " .. rec.requiredSkill) or ""
-            if rec.requiredSkillBorrowed then skill = skill .. "?" end
             local qty = rec.qty and (" x" .. rec.qty) or ""
             -- Only name the result when it differs from the recipe name.
             local made = ""

@@ -44,6 +44,9 @@ L["OFF"] = "|cffff5050off|r"
 L["BROKER_CLICK"] = "Click: open the lookup window"
 L["BROKER_RIGHT_CLICK"] = "Right-click: tooltip lines (%s)"
 
+L["BINDING_LOOKUP"] = "Look up mouseover / target"
+L["BINDING_TOGGLE"] = "Open / close window"
+
 L["WIN_SEARCH_HINT"] = "Search items and monsters..."
 L["WIN_ITEMS"] = "Items"
 L["WIN_NPCS"] = "Monsters & NPCs"

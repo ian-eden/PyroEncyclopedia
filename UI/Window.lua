@@ -367,6 +367,27 @@ function Window.Toggle()
     frame:SetShown(not frame:IsShown())
 end
 
+-- NPC id from a unit, or nil for players, pets and anything that isn't a creature.
+local function unitNpcId(unit)
+    if not UnitExists(unit) then return nil end
+    local unitType, npcId = (UnitGUID(unit) or ""):match("^(%a+)%-%d+%-%d+%-%d+%-%d+%-(%d+)")
+    if unitType == "Creature" or unitType == "Vehicle" then return tonumber(npcId) end
+end
+
+--- Key binding: open the page for whatever you're pointing at. Checks, in order, the mob under
+--- the mouse, your target, and an item tooltip on screen (bags, loot, chat); with none of
+--- those it just opens or closes the window.
+function Window.LookupUnderMouse()
+    local npcId = unitNpcId("mouseover") or unitNpcId("target")
+    if npcId then Window.Show("npc", npcId); return end
+    if GameTooltip:IsShown() then
+        local _, link = GameTooltip:GetItem()
+        local itemId = link and U.ParseItemId(link)
+        if itemId then Window.ShowItem(itemId); return end
+    end
+    Window.Toggle()
+end
+
 --- Open the window on `text`: an item id or link shows that item, anything else searches.
 function Window.Search(text)
     Window.Open()

@@ -165,6 +165,11 @@ frame:SetScript("OnEvent", function(_, event, arg1)
     end
 end)
 
+-- Key binding labels (Options > Key Bindings > AddOns).
+BINDING_HEADER_PYROENCYCLOPEDIA = "|cffff7f00Pyro|rEncyclopedia"
+BINDING_NAME_PYROENCYCLOPEDIA_LOOKUP = ns.L["BINDING_LOOKUP"]
+BINDING_NAME_PYROENCYCLOPEDIA_TOGGLE = ns.L["BINDING_TOGGLE"]
+
 -- Public API ------------------------------------------------------------------------------
 -- Stable surface for other addons and for /dump debugging. Everything else is internal.
 
@@ -179,6 +184,9 @@ PyroEncyclopedia = {
     GetItemReport = function(itemId, opts)
         return ns.ItemReport.Build(itemId, opts)
     end,
+    --- Key binding actions (Bindings.xml).
+    LookupUnderMouse = function() ns.Window.LookupUnderMouse() end,
+    Toggle = function() ns.Window.Toggle() end,
     GetProviderStatus = function()
         local out = {}
         for _, key in ipairs(ns.ProviderOrder) do

@@ -1,0 +1,10 @@
+<!-- Key bindings, set in the game under Options > Key Bindings > AddOns > PyroEncyclopedia.
+     The game loads this file automatically; the labels are set in Core/Init.lua. -->
+<Bindings>
+    <Binding name="PYROENCYCLOPEDIA_LOOKUP" header="PYROENCYCLOPEDIA" category="ADDONS">
+        PyroEncyclopedia.LookupUnderMouse()
+    </Binding>
+    <Binding name="PYROENCYCLOPEDIA_TOGGLE" category="ADDONS">
+        PyroEncyclopedia.Toggle()
+    </Binding>
+</Bindings>

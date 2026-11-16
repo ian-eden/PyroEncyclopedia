@@ -8,6 +8,9 @@ ignore = {
 globals = {
     "PyroEncyclopedia",
     "PyroEncyclopediaDB",
+    "BINDING_HEADER_PYROENCYCLOPEDIA",
+    "BINDING_NAME_PYROENCYCLOPEDIA_LOOKUP",
+    "BINDING_NAME_PYROENCYCLOPEDIA_TOGGLE",
     "SLASH_PYROENCYCLOPEDIA1",
     "SLASH_PYROENCYCLOPEDIA2",
     "SlashCmdList",
@@ -29,6 +32,8 @@ read_globals = {
     "TooltipDataProcessor",
     "GameTooltip",
     "UIParent",
+    "UnitExists",
+    "UnitGUID",
     "UISpecialFrames",
     "hooksecurefunc",
     "tinsert",

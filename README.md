@@ -52,6 +52,10 @@ shift-click any item in your bags, chat or loot window.
 **Item tooltips** get a few short lines: the best drop (with chance), a vendor and price, how
 many recipes use the item, and quests that need or reward it.
 
+**Hotkey:** in Options > Key Bindings > AddOns > PyroEncyclopedia, set a key for *Look up
+mouseover / target*. Press it while pointing at a monster (or with one targeted) to open its
+page, or while an item tooltip is showing to open that item.
+
 **Titan Panel:** right-click the panel and enable *PyroEncyclopedia*. Click the button to open
 the window; right-click it to turn the tooltip lines on or off. Other data-broker bars
 (ChocolateBar, Bazooka) work the same way.

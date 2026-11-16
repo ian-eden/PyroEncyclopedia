@@ -20,4 +20,6 @@ All notable changes to this project are documented here. Versions follow
   Back button.
 - Monster / NPC search: the search box lists matching monsters next to items; click one to
   see its level, zones, quests, drops and wares.
+- Key bindings (Options > Key Bindings > AddOns): look up the mob under the mouse, your
+  target or a hovered item; open / close the window.
 - Public API: `PyroEncyclopedia.RequestItemReport`, `GetItemReport`, `GetProviderStatus`.

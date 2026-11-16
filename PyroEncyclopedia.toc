@@ -31,6 +31,7 @@ Index\Index.lua
 Index\Recipes.lua
 Index\Quests.lua
 Index\ItemRelations.lua
+Index\NpcNames.lua
 
 Query\ItemReport.lua
 

@@ -18,4 +18,6 @@ All notable changes to this project are documented here. Versions follow
 - Titan Panel / data-broker button: click opens the window, right-click toggles tooltip lines.
 - Clickable names in the window: quest, NPC and recipe pages, item links everywhere, and a
   Back button.
+- Monster / NPC search: the search box lists matching monsters next to items; click one to
+  see its level, zones, quests, drops and wares.
 - Public API: `PyroEncyclopedia.RequestItemReport`, `GetItemReport`, `GetProviderStatus`.

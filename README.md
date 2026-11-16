@@ -46,7 +46,7 @@ but you get the full picture only with all three.
 | `/pyroenc status` | Show which databases are loaded, or why one isn't |
 | `/pyroenc tooltip` | Turn the extra item tooltip lines on or off |
 
-In the window, type at least three letters of an item name, or click into the search box and
+In the window, type at least three letters of an item or monster name, or click into the search box and
 shift-click any item in your bags, chat or loot window.
 
 **Item tooltips** get a few short lines: the best drop (with chance), a vendor and price, how

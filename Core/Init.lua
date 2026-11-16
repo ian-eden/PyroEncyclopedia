@@ -160,7 +160,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         -- Build the lookup indexes in the background shortly after login, so tooltips show
         -- recipe and quest lines without waiting for a first window lookup.
         if ns.db.prewarmIndexes and C_Timer then
-            C_Timer.After(5, function() ns.Index.Ensure({ "recipes", "quests" }) end)
+            C_Timer.After(5, function() ns.Index.Ensure({ "recipes", "quests", "npcNames" }) end)
         end
     end
 end)

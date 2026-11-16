@@ -16,7 +16,7 @@ local frame
 
 -- Search --------------------------------------------------------------------------------
 
-local function searchRows(text)
+local function itemRows(text)
     local IDB, Q = ns.Providers.LibItemDB, ns.Providers.Questie
     if IDB:IsAvailable() and IDB.lib.BuildWhereSearchRows then
         local rows, capped = IDB.lib:BuildWhereSearchRows(text)
@@ -27,7 +27,33 @@ local function searchRows(text)
     return {}, false
 end
 
-local function setResults(rows, capped, message)
+-- One result row's text. kind: "header" (section title), "item" or "npc".
+local function rowText(row)
+    if row.kind == "header" then return U.Gold(row.text) end
+    if row.kind == "npc" then
+        local npc = ns.Providers.Questie:GetNpc(row.id)
+        local lvl = npc and U.LevelRange(npc.minLevel, npc.maxLevel)
+        return "|cff7fc8ff" .. (npc and npc.name or tostring(row.id)) .. "|r" .. (lvl and U.Gray(" " .. lvl) or "")
+    end
+    local extra = row.itemLevel and row.itemLevel > 0 and U.Gray(" " .. row.itemLevel) or ""
+    return U.QualityName(row.id, row.plainName or row.name) .. extra
+end
+
+local function rowTooltip(self)
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+    if self.kind == "item" then
+        GameTooltip:SetHyperlink("item:" .. self.id)
+    else
+        local npc = ns.Providers.Questie:GetNpc(self.id)
+        GameTooltip:AddLine(npc and npc.name or tostring(self.id), 0.5, 0.78, 1)
+        if npc and npc.subName then GameTooltip:AddLine("<" .. npc.subName .. ">", 1, 1, 1) end
+        if npc and npc.zones[1] then GameTooltip:AddLine(ns.Zones.NameForArea(npc.zones[1].areaId), 1, 1, 1) end
+        GameTooltip:AddLine(L["WIN_CLICK_TO_OPEN"], 0.6, 0.6, 0.6)
+    end
+    GameTooltip:Show()
+end
+
+local function setResults(rows, message)
     local list = frame.results
     for i, row in ipairs(rows) do
         local b = list.buttons[i]
@@ -42,39 +68,64 @@ local function setResults(rows, capped, message)
             b.text:SetPoint("RIGHT", -4, 0)
             b.text:SetJustifyH("LEFT")
             b.text:SetWordWrap(false)
-            b:SetScript("OnClick", function(self) Window.ShowItem(self.itemId) end)
-            b:SetScript("OnEnter", function(self)
-                GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-                GameTooltip:SetHyperlink("item:" .. self.itemId)
-                GameTooltip:Show()
-            end)
+            b:SetScript("OnClick", function(self) if self.id then Window.Show(self.kind, self.id) end end)
+            b:SetScript("OnEnter", function(self) if self.id then rowTooltip(self) end end)
             b:SetScript("OnLeave", function() GameTooltip:Hide() end)
             list.buttons[i] = b
         end
-        b.itemId = row.id
-        local extra = row.itemLevel and row.itemLevel > 0 and U.Gray(" " .. row.itemLevel) or ""
-        b.text:SetText(U.QualityName(row.id, row.plainName or row.name) .. extra)
+        b.kind = row.kind
+        b.id = row.kind ~= "header" and row.id or nil
+        b:SetEnabled(b.id ~= nil)
+        b.text:SetText(rowText(row))
         b:Show()
     end
     for i = #rows + 1, #list.buttons do list.buttons[i]:Hide() end
     list.content:SetHeight(math.max(1, #rows * ROW_H))
     list:SetVerticalScroll(0)
-
-    if message then
-        frame.resultInfo:SetText(message)
-    elseif #rows == 0 then
-        frame.resultInfo:SetText(L["WIN_NO_RESULTS"])
-    else
-        frame.resultInfo:SetText(L[capped and "WIN_RESULTS_CAPPED" or "WIN_RESULTS"]:format(#rows))
-    end
+    frame.resultInfo:SetText(message or "")
 end
 
 local function runSearch()
     local text = (frame.search:GetText() or ""):match("^%s*(.-)%s*$")
     local id = U.ParseItemId(text)
     if id then Window.ShowItem(id); return end
-    if #text < 3 then setResults({}, false, L["WIN_TYPE_MORE"]); return end
-    setResults(searchRows(text))
+    if #text < 3 then setResults({}, L["WIN_TYPE_MORE"]); return end
+
+    -- The NPC name list is built the first time it's needed; search again once it's ready.
+    if ns.Providers.Questie:IsAvailable() and not ns.Index.IsReady("npcNames") then
+        ns.Index.Ensure({ "npcNames" }, function()
+            if frame.search:GetText():match("^%s*(.-)%s*$") == text then runSearch() end
+        end)
+    end
+
+    local items, itemsCapped = itemRows(text)
+    local npcs, npcsCapped = ns.Index.FindNpcs(text)
+    local sections = {
+        { title = L["WIN_ITEMS"], kind = "item", rows = items, capped = itemsCapped },
+        { title = L["WIN_NPCS"], kind = "npc", rows = npcs, capped = npcsCapped },
+    }
+    -- Typing a monster's exact name lists the monsters first.
+    if npcs[1] and (ns.Providers.Questie.Npc.name(npcs[1]) or ""):lower() == text:lower() then
+        sections[1], sections[2] = sections[2], sections[1]
+    end
+
+    local rows, capped = {}, false
+    for _, s in ipairs(sections) do
+        if #s.rows > 0 then
+            rows[#rows + 1] = { kind = "header", text = ("%s (%d%s)"):format(s.title, #s.rows, s.capped and "+" or "") }
+            for _, r in ipairs(s.rows) do
+                if s.kind == "npc" then
+                    rows[#rows + 1] = { kind = "npc", id = r }
+                else
+                    r.kind = "item"
+                    rows[#rows + 1] = r
+                end
+            end
+            capped = capped or s.capped
+        end
+    end
+    local message = #rows == 0 and L["WIN_NO_RESULTS"] or capped and L["WIN_RESULTS_CAPPED"] or nil
+    setResults(rows, message)
 end
 
 -- Pages (item / quest / npc / recipe, see UI/Pages.lua) ----------------------------------
@@ -287,7 +338,7 @@ local function create()
     end
 
     frame = f   -- setResults below reads the shared `frame`, so register it first
-    setResults({}, false, L["WIN_TYPE_MORE"])
+    setResults({}, L["WIN_TYPE_MORE"])
     return f
 end
 
